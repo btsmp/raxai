@@ -1,6 +1,6 @@
 package com.bsampio.raxai.services;
 
-import com.bsampio.raxai.dtos.UserDTO;
+import com.bsampio.raxai.dtos.RegisterDTO;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.models.UserRole;
 import com.bsampio.raxai.repository.UserRepository;
@@ -16,7 +16,7 @@ public class UserService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-     public User createUser(UserDTO user) {
+     public User createUser(RegisterDTO user) {
          if (repository.existsByEmail(user.email())) {
             throw new IllegalArgumentException("Email already in use");
          }

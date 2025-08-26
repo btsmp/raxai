@@ -1,6 +1,6 @@
 package com.bsampio.raxai.controller;
 
-import com.bsampio.raxai.dtos.UserDTO;
+import com.bsampio.raxai.dtos.RegisterDTO;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class UserController {
 
 
     @PostMapping
-    public User createUser(@RequestBody UserDTO user) {
+    public User createUser(@RequestBody RegisterDTO user) {
         return service.createUser(user);
     }
 }
