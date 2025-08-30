@@ -3,6 +3,7 @@ package com.bsampio.raxai.controller;
 import com.bsampio.raxai.dtos.AuthRequestDTO;
 import com.bsampio.raxai.dtos.LoginResponseDTO;
 import com.bsampio.raxai.services.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +22,7 @@ public class AuthController {
     AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody AuthRequestDTO data) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody AuthRequestDTO data) {
         String token = authService.login(data, authenticationManager);
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }

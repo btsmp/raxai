@@ -1,14 +1,13 @@
 package com.bsampio.raxai.services;
 
 import com.bsampio.raxai.dtos.AuthRequestDTO;
-import com.bsampio.raxai.dtos.LoginResponseDTO;
+
 import com.bsampio.raxai.infra.security.TokenService;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,5 +34,9 @@ public class AuthService implements UserDetailsService {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         return tokenService.generateToken((User) auth.getPrincipal());
+    }
+
+    static public User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

@@ -3,6 +3,7 @@ package com.bsampio.raxai.controller;
 import com.bsampio.raxai.dtos.RegisterDTO;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +17,8 @@ public class UserController {
     @Autowired
     UserService service;
 
-
-
     @PostMapping
-    public User createUser(@RequestBody RegisterDTO user) {
+    public User createUser(@Valid @RequestBody RegisterDTO user) {
         return service.createUser(user);
     }
 }
