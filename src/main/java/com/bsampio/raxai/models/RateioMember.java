@@ -26,5 +26,5 @@ public class RateioMember {
     private LocalDateTime joinedAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    private MemberRateioStatus status;
+    private MemberRateioStatusPayment status;
 }

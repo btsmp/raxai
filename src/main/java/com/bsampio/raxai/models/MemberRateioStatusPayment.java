@@ -1,6 +1,6 @@
 package com.bsampio.raxai.models;
 
-public enum MemberRateioStatus {
+public enum MemberRateioStatusPayment {
     PENDING,
     REJECTED,
     PAID,

@@ -5,10 +5,7 @@ import com.bsampio.raxai.models.Rateio;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.services.RateioService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.bsampio.raxai.services.AuthService.getCurrentUser;
 
@@ -31,7 +28,10 @@ public class RateioController {
     }
 
     @PostMapping("/{inviteCode}/join")
-    public String joinRateio() {
-        return "Joined rateio";
+    public String joinRateio(@PathVariable String inviteCode) {
+
+        User user = getCurrentUser();
+
+        return rateioService.joinRateio(inviteCode, user);
     }
 }
