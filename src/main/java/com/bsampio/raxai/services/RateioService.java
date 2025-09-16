@@ -1,6 +1,8 @@
 package com.bsampio.raxai.services;
 
 import com.bsampio.raxai.dtos.CreateRateioDTO;
+import com.bsampio.raxai.dtos.out.OwnerRateioDetailsDTO;
+import com.bsampio.raxai.dtos.out.RateioByUserDTO;
 import com.bsampio.raxai.models.MemberRateioStatusPayment;
 import com.bsampio.raxai.models.Rateio;
 import com.bsampio.raxai.models.RateioMember;
@@ -9,6 +11,8 @@ import com.bsampio.raxai.repository.RateioMemberRepository;
 import com.bsampio.raxai.repository.RateioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class RateioService {
@@ -84,6 +88,69 @@ public class RateioService {
 
         return "Joined rateio successfully";
     }
+
+    @Transactional
+    public String leaveRateio(Long id, User currentUser) {
+
+        Rateio rateio = rateioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Rateio not found"));
+
+        if (rateio.getOwner().getId().equals(currentUser.getId())) {
+            throw new IllegalStateException("Owner cannot leave their own rateio");
+        }
+
+        RateioMember member = rateio.getMembers().stream()
+                .filter(m -> m.getUser().getId().equals(currentUser.getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("User is not a member of this rateio"));
+
+        rateio.getMembers().remove(member);
+        rateioMemberRepository.delete(member);
+
+        int newCurrentMembers = rateio.getCurrentMembers() - 1;
+        rateio.setCurrentMembers(newCurrentMembers);
+
+        if (newCurrentMembers > 0) {
+            double newAmountPerParticipant = rateio.getTotalAmount() / newCurrentMembers;
+            rateio.setAmountPerParticipant(newAmountPerParticipant);
+        } else {
+            rateio.setAmountPerParticipant(0.0);
+        }
+
+        rateioRepository.save(rateio);
+
+        return "Left rateio successfully";
+    }
+
+    public List<Rateio> listRateioByUser(User currentUser) {
+        Long userId = currentUser.getId();
+
+        return rateioRepository.findByOwnerIdOrMemberUserId(userId);
+
+
+    }
+
+    public Rateio getRateioDetailsById(Long id) {
+        return rateioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Rateio not found"));
+    }
+
+
+    /* TODO:
+    *   Excluir rateio se o owner sair e não tiver mais membros;
+    *   Atualizar amountPerParticipant quando um membro sair;
+    *   Rota de sair do rateio;
+    *   Rota de detalhes do rateio;
+    *   Rota para listar os rateios que o user participa;
+    *   Rota para listar os membros do rateio;
+    *   Rota para o owner marcar um membro como pago;
+    *   Rota para o membro ver o status do pagamento dele;
+    *   Rota de listar os rateios que um user participa; ✔
+    *   Rota de deletar o rateio (somente o owner pode);
+    *   Rota para remover um membro (somente o owner pode);
+    *   Rota para atualizar o rateio (somente o owner pode);
+    * */
+
 
     private String generateInviteCode(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
