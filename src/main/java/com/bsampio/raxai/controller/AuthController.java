@@ -1,7 +1,7 @@
 package com.bsampio.raxai.controller;
 
-import com.bsampio.raxai.dtos.AuthRequestDTO;
-import com.bsampio.raxai.dtos.LoginResponseDTO;
+import com.bsampio.raxai.infra.dtos.AuthRequestDTO;
+import com.bsampio.raxai.infra.dtos.LoginResponseDTO;
 import com.bsampio.raxai.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

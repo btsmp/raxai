@@ -1,6 +1,6 @@
 package com.bsampio.raxai.services;
 
-import com.bsampio.raxai.dtos.AuthRequestDTO;
+import com.bsampio.raxai.infra.dtos.AuthRequestDTO;
 
 import com.bsampio.raxai.infra.security.TokenService;
 import com.bsampio.raxai.models.User;

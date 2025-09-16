@@ -1,4 +1,4 @@
-package com.bsampio.raxai.dtos;
+package com.bsampio.raxai.infra.dtos;
 
 import jakarta.validation.constraints.NotNull;
 

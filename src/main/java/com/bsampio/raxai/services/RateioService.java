@@ -1,8 +1,7 @@
 package com.bsampio.raxai.services;
 
-import com.bsampio.raxai.dtos.CreateRateioDTO;
-import com.bsampio.raxai.dtos.out.OwnerRateioDetailsDTO;
-import com.bsampio.raxai.dtos.out.RateioByUserDTO;
+import com.bsampio.raxai.infra.dtos.CreateRateioDTO;
+import com.bsampio.raxai.infra.messages.rateio.RateioErrorMessages;
 import com.bsampio.raxai.models.MemberRateioStatusPayment;
 import com.bsampio.raxai.models.Rateio;
 import com.bsampio.raxai.models.RateioMember;
@@ -51,22 +50,22 @@ public class RateioService {
         Rateio rateio = rateioRepository.findByInviteCode(inviteCode);
 
         if (rateio == null) {
-            throw new IllegalArgumentException("Invalid invite code");
+            throw new IllegalArgumentException(RateioErrorMessages.INVALID_INVITE_CODE.getMessage());
         }
 
         if (rateio.getCurrentMembers() >= rateio.getMaxMembers()) {
-            throw new IllegalStateException("Rateio is full");
+            throw new IllegalStateException(RateioErrorMessages.RATEIO_FULL.getMessage());
         }
 
         if (rateio.getOwner().getId().equals(currentUser.getId())) {
-            throw new IllegalStateException("Owner cannot join their own rateio");
+            throw new IllegalStateException(RateioErrorMessages.OWNER_CANNOT_JOIN.getMessage());
         }
 
         boolean alreadyMember = rateio.getMembers().stream()
                 .anyMatch(member -> member.getUser().getId().equals(currentUser.getId()));
 
         if (alreadyMember) {
-            throw new IllegalStateException("User is already a member of this rateio");
+            throw new IllegalStateException(RateioErrorMessages.USER_ALREADY_MEMBER.getMessage());
         }
 
         RateioMember newMember = new RateioMember();
@@ -93,16 +92,16 @@ public class RateioService {
     public String leaveRateio(Long id, User currentUser) {
 
         Rateio rateio = rateioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Rateio not found"));
+                .orElseThrow(() -> new IllegalArgumentException(RateioErrorMessages.RATEIO_NOT_FOUND.getMessage()));
 
         if (rateio.getOwner().getId().equals(currentUser.getId())) {
-            throw new IllegalStateException("Owner cannot leave their own rateio");
+            throw new IllegalStateException(RateioErrorMessages.OWNER_CANNOT_LEAVE.getMessage());
         }
 
         RateioMember member = rateio.getMembers().stream()
                 .filter(m -> m.getUser().getId().equals(currentUser.getId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("User is not a member of this rateio"));
+                .orElseThrow(() -> new IllegalStateException(RateioErrorMessages.USER_NOT_MEMBER.getMessage()));
 
         rateio.getMembers().remove(member);
         rateioMemberRepository.delete(member);
@@ -124,15 +123,24 @@ public class RateioService {
 
     public List<Rateio> listRateioByUser(User currentUser) {
         Long userId = currentUser.getId();
-
         return rateioRepository.findByOwnerIdOrMemberUserId(userId);
-
-
     }
 
     public Rateio getRateioDetailsById(Long id) {
         return rateioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Rateio not found"));
+                .orElseThrow(() -> new IllegalArgumentException(RateioErrorMessages.RATEIO_NOT_FOUND.getMessage()));
+    }
+
+    public String deleteRateio(Long id, User currentUser) {
+        Rateio rateio = rateioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(RateioErrorMessages.RATEIO_NOT_FOUND.getMessage()));
+
+        if (!rateio.getOwner().getId().equals(currentUser.getId())) {
+            throw new IllegalStateException(RateioErrorMessages.ONLY_OWNER_CAN_DELETE.getMessage());
+        }
+
+        rateioRepository.delete(rateio);
+        return "Rateio deleted successfully";
     }
 
 

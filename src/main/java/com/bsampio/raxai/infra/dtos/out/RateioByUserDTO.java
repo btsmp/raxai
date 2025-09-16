@@ -1,4 +1,4 @@
-package com.bsampio.raxai.dtos.out;
+package com.bsampio.raxai.infra.dtos.out;
 
 import java.time.LocalDateTime;
 

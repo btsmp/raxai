@@ -1,6 +1,6 @@
 package com.bsampio.raxai.controller;
 
-import com.bsampio.raxai.dtos.RegisterDTO;
+import com.bsampio.raxai.infra.dtos.RegisterDTO;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.services.UserService;
 import jakarta.validation.Valid;

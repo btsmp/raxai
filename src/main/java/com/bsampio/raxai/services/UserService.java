@@ -1,6 +1,7 @@
 package com.bsampio.raxai.services;
 
-import com.bsampio.raxai.dtos.RegisterDTO;
+import com.bsampio.raxai.infra.dtos.RegisterDTO;
+import com.bsampio.raxai.infra.messages.user.UserErrorMessages;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.models.UserRole;
 import com.bsampio.raxai.repository.UserRepository;
@@ -18,7 +19,7 @@ public class UserService {
 
      public User createUser(RegisterDTO user) {
          if (repository.existsByEmail(user.email())) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new IllegalArgumentException(UserErrorMessages.EMAIL_ALREADY_EXISTS.getMessage());
          }
 
          User newUser = new User();

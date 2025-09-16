@@ -1,14 +1,17 @@
 package com.bsampio.raxai.controller;
 
-import com.bsampio.raxai.dtos.CreateRateioDTO;
-import com.bsampio.raxai.dtos.out.OwnerRateioDetailsDTO;
-import com.bsampio.raxai.dtos.out.RateioByUserDTO;
-import com.bsampio.raxai.dtos.out.RateioDetailsDTO;
-import com.bsampio.raxai.dtos.out.RateioMemberDTO;
+import com.bsampio.raxai.infra.dtos.CreateRateioDTO;
+import com.bsampio.raxai.infra.dtos.out.OwnerRateioDetailsDTO;
+import com.bsampio.raxai.infra.dtos.out.RateioByUserDTO;
+import com.bsampio.raxai.infra.dtos.out.RateioDetailsDTO;
+import com.bsampio.raxai.infra.dtos.out.RateioMemberDTO;
+import com.bsampio.raxai.infra.http.ApiResponse;
+import com.bsampio.raxai.infra.messages.rateio.RateioMessages;
 import com.bsampio.raxai.models.Rateio;
 import com.bsampio.raxai.models.User;
 import com.bsampio.raxai.services.RateioService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,27 +29,25 @@ public class RateioController {
     }
 
     @PostMapping("/create")
-    public Rateio createRateio(@RequestBody @Valid CreateRateioDTO data) {
-
+    public ResponseEntity<ApiResponse<Rateio>> createRateio(@RequestBody @Valid CreateRateioDTO data) {
         User user = getCurrentUser();
-
-        return rateioService.createRateio(data, user);
+        Rateio rateio =  rateioService.createRateio(data, user);
+        return ResponseEntity.ok(ApiResponse.success(RateioMessages.RATEIO_CREATED.getMessage(), rateio));
     }
 
     @PostMapping("/{inviteCode}/join")
-    public String joinRateio(@PathVariable String inviteCode) {
-
+    public ResponseEntity<ApiResponse<String>> joinRateio(@PathVariable String inviteCode) {
         User user = getCurrentUser();
-
-        return rateioService.joinRateio(inviteCode, user);
+        String data = rateioService.joinRateio(inviteCode, user);
+        return ResponseEntity.ok(ApiResponse.success(RateioMessages.RATEIO_JOINED.getMessage(), data));
     }
 
     @GetMapping("/me")
-    public List<RateioByUserDTO> getUserRateios() {
+    public ResponseEntity<ApiResponse<List<RateioByUserDTO>>> getUserRateios() {
         User user = getCurrentUser();
         List<Rateio> rateios =  rateioService.listRateioByUser(user);
 
-        return rateios.stream()
+        List<RateioByUserDTO> data = rateios.stream()
                 .map(rateio -> new RateioByUserDTO(
                         rateio.getId(),
                         rateio.getTitle(),
@@ -63,15 +64,15 @@ public class RateioController {
                         rateio.getCreatedAt()
                 ))
                 .toList();
+
+        return ResponseEntity.ok(ApiResponse.success(RateioMessages.RATEIO_LIST.getMessage(), data));
     }
 
     @GetMapping("details/{rateioId}")
-    public RateioDetailsDTO getRateioDetails(@PathVariable Long rateioId) {
-        User user = getCurrentUser();
+    public ResponseEntity<ApiResponse<RateioDetailsDTO>> getRateioDetails(@PathVariable Long rateioId) {
+        Rateio rateio = rateioService.getRateioDetailsById(rateioId);
 
-        Rateio rateio = rateioService.getRateioDetails(rateioId, user);
-
-        return new RateioDetailsDTO(
+        RateioDetailsDTO data = new RateioDetailsDTO(
                 rateio.getId(),
                 rateio.getTitle(),
                 rateio.getMaxMembers(),
@@ -94,5 +95,23 @@ public class RateioController {
                 ),
                 rateio.getCreatedAt()
         );
+
+        return ResponseEntity.ok(ApiResponse.success(RateioMessages.RATEIO_DETAILS.getMessage(), data));
+    }
+
+    @DeleteMapping("/{rateioId}/leave")
+    public ResponseEntity<ApiResponse<String>> leaveRateio(@PathVariable Long rateioId) {
+        User user = getCurrentUser();
+        String data = rateioService.leaveRateio(rateioId, user);
+
+        return ResponseEntity.ok(ApiResponse.success(RateioMessages.RATEIO_LEFT.getMessage(), data));
+    }
+
+    @DeleteMapping("/{rateioId}/delete")
+    public ResponseEntity<ApiResponse<String>> deleteRateio(@PathVariable Long rateioId) {
+        User user = getCurrentUser();
+        String data = rateioService.deleteRateio(rateioId, user);
+
+        return ResponseEntity.ok(ApiResponse.success(RateioMessages.RATEIO_DELETED.getMessage(), data));
     }
 }
